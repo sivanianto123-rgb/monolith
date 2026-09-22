@@ -99,6 +99,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             'this site and try again.';
       case 'email-already-in-use':
         return 'An account already exists with that email.';
+      case 'invalid-email':
+        return 'That email address is not valid.';
       case 'invalid-credential':
       case 'wrong-password':
       case 'user-not-found':
