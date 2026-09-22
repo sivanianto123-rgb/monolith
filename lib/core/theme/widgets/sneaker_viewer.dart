@@ -37,7 +37,15 @@ class SneakerViewer extends StatelessWidget {
         child: ModelViewer(
           key: ValueKey(glbAsset),
           backgroundColor: backgroundColor,
-          src: glbAsset,
+          // model_viewer_plus injects <model-viewer src="..."> as raw HTML
+          // into the page, bypassing Flutter's rootBundle/AssetManifest
+          // resolution entirely — the browser resolves it as a normal
+          // relative URL against the page's own address. `flutter build web`
+          // copies pubspec assets to build/web/assets/<declared path>, so an
+          // asset declared as assets/models/x.glb is actually served at
+          // assets/assets/models/x.glb. The debug dev server tolerates both
+          // forms, which is why this only breaks after a real build/deploy.
+          src: 'assets/$glbAsset',
           alt: 'A Monolith sneaker in 3D',
           cameraControls: interactive,
           disableZoom: !interactive,
