@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471680982252",
+    "project_id": "monolithe-sneaker",
+    "storage_bucket": "monolithe-sneaker.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471680982252:android:d6ddda20fe56af8301d9c9",
+        "android_client_info": {
+          "package_name": "com.monolith.monolith"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqH-DoDHmJbTCkSno8X0yza9TUl1CzZeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

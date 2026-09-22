@@ -1,0 +1,58 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidColors(colors) {
+      return colors.keys().hasAll(['upper', 'sole', 'stripe', 'laces', 'toe'])
+        && colors.upper is int && colors.sole is int && colors.stripe is int
+        && colors.laces is int && colors.toe is int;
+    }
+
+    match /users/{uid} {
+      // We never write the parent user doc directly, but let a signed-in
+      // owner read/create it in case that changes later (e.g. a profile doc).
+      allow read: if isOwner(uid);
+      allow write: if false;
+
+      match /savedDesigns/{designId} {
+        allow read, delete: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['name', 'modelSlug', 'colors', 'createdAt'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+          && request.resource.data.modelSlug is string
+          && isValidColors(request.resource.data.colors)
+          && request.resource.data.createdAt == request.time;
+
+        // Designs are create-once/delete-only from the client; no in-place edits.
+        allow update: if false;
+      }
+
+      match /orders/{orderId} {
+        allow read: if isOwner(uid);
+
+        allow create: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['items', 'totalCents', 'shipping', 'status', 'createdAt'])
+          && request.resource.data.items is list && request.resource.data.items.size() > 0
+          && request.resource.data.totalCents is int && request.resource.data.totalCents > 0
+          && request.resource.data.status == 'confirmed'
+          && request.resource.data.createdAt == request.time;
+
+        // Orders are immutable once placed — no client-side edits or deletes.
+        // (A real backend would update status via a trusted server/Cloud
+        // Function using the Admin SDK, which bypasses these rules.)
+        allow update, delete: if false;
+      }
+    }
+  }
+}
