@@ -22,6 +22,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script type="module" src="./assets/packages/model_viewer_plus/assets/model-viewer.min.js" defer></script>
 
+  <!--
+    Warm the 3D assets while Flutter boots. <model-viewer> only requests its
+    GLB once the Flutter view has rendered, so without this every model load
+    starts from zero after startup. Paths use the assets/assets/... form that
+    `flutter build web` emits (see SneakerViewer). crossorigin is required so
+    the preloaded response matches three.js's fetch() (cors, same-origin
+    credentials) and gets reused instead of downloaded twice.
+
+    The hero model (gold, above the fold on Home) is preloaded at high
+    priority; the rest are ~60-80 MB each, so they're only prefetched at idle
+    priority to avoid starving main.dart.js / CanvasKit.
+  -->
+  <link rel="modulepreload" href="./assets/packages/model_viewer_plus/assets/model-viewer.min.js">
+  <link rel="preload" href="assets/assets/models/gold.glb" as="fetch" type="model/gltf-binary" crossorigin="anonymous">
+  <link rel="prefetch" href="assets/assets/models/blue.glb" as="fetch" type="model/gltf-binary" crossorigin="anonymous">
+  <link rel="prefetch" href="assets/assets/models/red.glb" as="fetch" type="model/gltf-binary" crossorigin="anonymous">
+
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
